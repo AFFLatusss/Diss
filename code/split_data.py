@@ -22,7 +22,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(source, train_path, test_path,train_ratio):
+def split(source, train_path, test_path,train_ratio):
     #get directories
     _, dirs, _ = next(os.walk(source))
 
@@ -43,10 +43,16 @@ def main(source, train_path, test_path,train_ratio):
         class_train_path = os.path.join(train_path, dirs[i]) #target path to the class folder
         class_test_path = os.path.join(test_path, dirs[i]) #target path to the class folder
 
-        if not os.path.exists(class_train_path):
+        if os.path.exists(class_train_path):
+            shutil.rmtree(class_train_path) #remove existing train folder and contents
+            os.makedirs(class_train_path) #Create folder
+        else:
             os.makedirs(class_train_path) #create directory if not exist
         
-        if not os.path.exists(class_test_path):
+        if os.path.exists(class_test_path):
+            shutil.rmtree(class_test_path) #remove existing test folder and contents
+            os.makedirs(class_test_path) #create folder
+        else:
             os.makedirs(class_test_path) #create directory if not exist
 
         files = get_files_from_folder(class_source_path)
@@ -63,11 +69,11 @@ def main(source, train_path, test_path,train_ratio):
             source_file = os.path.join(class_source_path, files[k])
             shutil.copy(source_file, target_file)
 
-
-
         if len(os.listdir(class_test_path)) + len(os.listdir(class_train_path)) !=  len(os.listdir(class_source_path)):
-            print(f"Split sum is {len(os.listdir(class_test_path)) + len(os.listdir(class_train_path))}, should be {len(os.listdir(class_source_path))}")
-            print("Entry number incorrect")
+            print(f"Data Split Incorrect for {dirs[i]} ")
+            print(f"Training samples: {len(os.listdir(class_test_path))}, Testing samples: {len(os.listdir(class_test_path))}")
+            print(f"Samples sum should be {len(os.listdir(class_source_path))}")
+            # print(f"Split sum is {len(os.listdir(class_test_path)) + len(os.listdir(class_train_path))}, should be {len(os.listdir(class_source_path))}")
         else:
             print("---------------------")
             print(f"Finish splitting {dirs[i]}")
@@ -75,4 +81,4 @@ def main(source, train_path, test_path,train_ratio):
             
 if __name__ == "__main__":
     args = parse_args()
-    main(args.source, args.train_target, args.test_target, float(args.ratio))
+    split(args.source, args.train_target, args.test_target, float(args.ratio))
