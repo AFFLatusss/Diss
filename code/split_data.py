@@ -36,6 +36,8 @@ def split(source, train_path, test_path,train_ratio):
     count_test_per_class = np.round(count_per_class * (1 - train_ratio)) #how many entries per class for test 
 
     #transfer files from source to target
+    test_sum, train_sum = 0, 0
+
     for i in range(len(dirs)):
         class_source_path = os.path.join(source, dirs[i]) #get source path to class folder
 
@@ -75,10 +77,13 @@ def split(source, train_path, test_path,train_ratio):
             print(f"Samples sum should be {len(os.listdir(class_source_path))}")
             # print(f"Split sum is {len(os.listdir(class_test_path)) + len(os.listdir(class_train_path))}, should be {len(os.listdir(class_source_path))}")
         else:
-            print("---------------------")
+            test_sum += len(os.listdir(class_test_path))
+            train_sum += len(os.listdir(class_train_path))
             print(f"Finish splitting {dirs[i]}")
             print(f"[Training Samples:{len(os.listdir(class_train_path))}, Testing Samples:{len(os.listdir(class_test_path))}]   Original Samples:{len(os.listdir(class_source_path))}")
-            
+            print("---------------------")
+
+    print(f"Total Training Samples: {train_sum}, Testing Samples: {test_sum}, Total Samples: {train_sum + test_sum}")          
 if __name__ == "__main__":
     args = parse_args()
     split(args.source, args.train_target, args.test_target, float(args.ratio))
