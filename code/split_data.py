@@ -4,11 +4,23 @@ import os
 import argparse
 
 def get_files_from_folder(path):
+    """ list all files in the given folder
+
+    Parameters
+        ----------
+        path : str
+            The path to the directory
+
+    """
     files = os.listdir(path)
     return np.asarray(files)
 
 
 def parse_args():
+    """ argument parser for running this script from the command line
+
+    """
+
     parser = argparse.ArgumentParser(description="Dataset divider")
 
     parser.add_argument("--source", required=True, 
@@ -18,11 +30,46 @@ def parse_args():
     parser.add_argument("--test_target", required=True, 
                         help="path to save testing data")
     parser.add_argument("--ratio", required=True, 
-                        help="Train ratio, E.g. 0.7 means splitting data into 70% training and 30% testting")
+                        help="Train ratio, E.g. 0.7 means splitting data into 70% training and 30% testing")
     return parser.parse_args()
 
 
-def split(source, train_path, test_path,train_ratio):
+
+def create_directory(path):
+    """ if path exists, then remove directory to clean content and then create a new directory
+        else create directory directly
+
+    Parameters
+        ----------
+        path : str
+            The path to the directory to store dataset
+
+    """
+    if os.path.exists(path):
+        shutil.rmtree(path) #remove existing train folder and contents
+        os.makedirs(path) #Create folder
+    else:
+        os.makedirs(path) #create directory if not exist
+
+
+
+def split(source, train_path, test_path,train_ratio=0.7):
+    """ Split the original directory into train and test directories containing train and test samples
+
+    Parameters
+        ----------
+        source : str
+            The path to the directory containing all samples
+        train_path : str
+            The path to the directory for training samples
+        test_path : str
+            The path to the directory for testing samples
+        train_ratio : float
+            The ratio of train and test. Default set to 0.7, which means 70% of the original files are training samples
+
+    """
+
+
     #get directories
     _, dirs, _ = next(os.walk(source))
 
@@ -84,6 +131,8 @@ def split(source, train_path, test_path,train_ratio):
             print("---------------------")
 
     print(f"Total Training Samples: {train_sum}, Testing Samples: {test_sum}, Total Samples: {train_sum + test_sum}")          
+
+
 if __name__ == "__main__":
     args = parse_args()
     split(args.source, args.train_target, args.test_target, float(args.ratio))
