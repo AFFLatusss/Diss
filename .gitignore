@@ -12,3 +12,4 @@ example_data/
 test_data/
 train_data/
 test.py
+code/__pycache__/
