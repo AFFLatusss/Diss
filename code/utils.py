@@ -6,8 +6,12 @@ from torchvision import transforms
 
 
 
-def load_efficient_net(pretrained=False):
-    model = models.efficientnet_b0(pretrained=pretrained)
+def load_efficient_net(pretrain=False):
+    model = models.efficientnet_b0(pretrained=pretrain)
+    # if pretrain:
+    #     weights = models.EfficientNet_B0_Weights.DEFAULT
+    for param in model.parameters:
+        param.requires_grad = False
     model.eval()
 
     return model
