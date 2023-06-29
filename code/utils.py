@@ -20,8 +20,11 @@ def load_efficient_net():
     return model
 
 
-def load_mobile_net(pretrained=False):
-    model = models.mobilenet_v2(pretrained=pretrained)
+def load_mobile_net():
+    model = models.mobilenet_v2(weights="DEFAULT")
+
+    for param in model.features.parameters():
+        param.requires_grad = False
     model.eval()
 
     return model
@@ -104,7 +107,7 @@ def train_step(model: torch.nn.Module,
 def test_step(model: torch.nn.Module, 
               dataloader: torch.utils.data.DataLoader, 
               loss_fn: torch.nn.Module,
-              device: torch.device) -> Tuple[float, float]:
+              device: torch.device):
     """Tests a PyTorch model for a single epoch.
 
     Turns a target PyTorch model to "eval" mode and then performs
@@ -150,6 +153,7 @@ def test_step(model: torch.nn.Module,
     test_acc = test_acc / len(dataloader)
     return test_loss, test_acc
 
+
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
           test_dataloader: torch.utils.data.DataLoader, 
@@ -194,3 +198,33 @@ def train(model: torch.nn.Module,
     return results
 
     
+def test_run(model, test_data, device, batch_size, classes):
+    with torch.no_grad():
+        n_correct = 0
+        n_samples = 0
+        n_classcorrect = [0 for i in range(4)] 
+        n_classsamples = [0 for i in range(4)]
+
+        for images, labels in test_data:
+            images = images.to(device)
+            labels = labels.to(device)
+            output = model(images)
+
+            _, predicted = torch.max(output, 1)
+            n_samples += labels.size(0)
+            n_correct += (predicted==labels).sum().item()
+
+
+            for i in range(batch_size):
+                label = labels[i]
+                pred = predicted[i]
+                if label == pred:
+                    n_classcorrect[label] += 1
+                n_classsamples[label] += 1
+            
+        acc = (n_correct/n_samples)*100
+        print(f"samples accuracy: {acc:.3f}%")
+
+        for i in range(4):
+            acc = n_classcorrect[i]/n_classsamples[i] *100
+            print(f"Acc for Class {classes[i]} = {acc:.3f}%")
