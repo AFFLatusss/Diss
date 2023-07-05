@@ -217,7 +217,6 @@ def train(model: torch.nn.Module,
 
     
 def test_run(model, test_data, device, batch_size, classes):
-    print("new test")
     with torch.no_grad():
         n_correct = 0
         n_samples = 0
@@ -240,12 +239,13 @@ def test_run(model, test_data, device, batch_size, classes):
 
             
 
-            for i in range(batch_size):
+            for i in range(len(labels)):
                 label = labels[i]
                 pred = predicted[i]
                 if label == pred:
                     n_classcorrect[label] += 1
                 n_classsamples[label] += 1
+
 
             pred_labels = pred_labels + predicted.tolist()
             target_labels = target_labels + labels.tolist()
