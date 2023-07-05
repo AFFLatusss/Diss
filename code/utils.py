@@ -3,6 +3,7 @@ import torch
 import time
 import matplotlib.pyplot as plt
 from torchvision import transforms
+from torcheval.metrics.functional import multiclass_f1_score
 
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
@@ -69,6 +70,8 @@ def train_step(model: torch.nn.Module,
 
   # Setup train loss and train accuracy values
     train_loss, train_acc = 0, 0
+    pred_labels = []
+    target_labels = []
 
   # Loop through data loader data batches
     for batch, (X, y) in enumerate(dataloader):
@@ -95,12 +98,14 @@ def train_step(model: torch.nn.Module,
         y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
         train_acc += (y_pred_class == y).sum().item()/len(y_pred)
 
+        pred_labels = pred_labels + y_pred_class.tolist()
+        target_labels = target_labels + y.tolist()
     # Adjust metrics to get average loss and accuracy per batch 
     train_loss = train_loss / len(dataloader)
     train_acc = train_acc / len(dataloader)
+    train_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
 
-
-    return train_loss, train_acc
+    return train_loss, train_acc, train_f1
 
 
 
@@ -130,6 +135,8 @@ def test_step(model: torch.nn.Module,
 
     # Setup test loss and test accuracy values
     test_loss, test_acc = 0, 0
+    pred_labels = []
+    target_labels = []
 
     # Turn on inference context manager
     with torch.inference_mode():
@@ -147,11 +154,16 @@ def test_step(model: torch.nn.Module,
             # Calculate and accumulate accuracy
             test_pred_labels = test_pred_logits.argmax(dim=1)
             test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
+            
+            pred_labels = pred_labels + test_pred_labels.tolist()
+            target_labels = target_labels + y.tolist()
 
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)
     test_acc = test_acc / len(dataloader)
-    return test_loss, test_acc
+
+    test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
+    return test_loss, test_acc, test_f1
 
 
 def train(model: torch.nn.Module, 
@@ -164,17 +176,19 @@ def train(model: torch.nn.Module,
     
     results = {"train_loss": [],
       "train_acc": [],
+      "train_f1": [],
       "test_loss": [],
-      "test_acc": []
+      "test_acc": [],
+      "test_f1": []
     }
 
     for epoch in tqdm(range(epochs)):
-      train_loss, train_acc = train_step(model=model,
+      train_loss, train_acc, train_f1 = train_step(model=model,
                                           dataloader=train_dataloader,
                                           loss_fn=loss_fn,
                                           optimizer=optimizer,
                                           device=device)
-      test_loss, test_acc = test_step(model=model,
+      test_loss, test_acc, test_f1 = test_step(model=model,
           dataloader=test_dataloader,
           loss_fn=loss_fn,
           device=device)
@@ -184,21 +198,26 @@ def train(model: torch.nn.Module,
           f"Epoch: {epoch+1} | "
           f"train_loss: {train_loss:.4f} | "
           f"train_acc: {train_acc:.4f} | "
+          f"train_f1: {train_f1:.4f} | "
           f"test_loss: {test_loss:.4f} | "
-          f"test_acc: {test_acc:.4f}"
+          f"test_acc: {test_acc:.4f} | "
+          f"test_f1: {test_f1:.4f} | "
       )
 
       # Update results dictionary
       results["train_loss"].append(train_loss)
       results["train_acc"].append(train_acc)
+      results["train_f1"].append(train_f1)
       results["test_loss"].append(test_loss)
       results["test_acc"].append(test_acc)
+      results["test_f1"].append(test_f1)
 
   # Return the filled results at the end of the epochs
     return results
 
     
 def test_run(model, test_data, device, batch_size, classes):
+    
     with torch.no_grad():
         n_correct = 0
         n_samples = 0
