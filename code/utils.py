@@ -217,22 +217,28 @@ def train(model: torch.nn.Module,
 
     
 def test_run(model, test_data, device, batch_size, classes):
-
+    print("new test")
     with torch.no_grad():
         n_correct = 0
         n_samples = 0
         n_classcorrect = [0 for i in range(4)] 
         n_classsamples = [0 for i in range(4)]
 
+        pred_labels = []
+        target_labels = []
+
         for images, labels in test_data:
             images = images.to(device)
             labels = labels.to(device)
             output = model(images)
 
-            _, predicted = torch.max(output, 1)
+            # _, predicted = torch.max(output, 1)
+            predicted = output.argmax(dim=1)
+
             n_samples += labels.size(0)
             n_correct += (predicted==labels).sum().item()
 
+            
 
             for i in range(batch_size):
                 label = labels[i]
@@ -240,10 +246,52 @@ def test_run(model, test_data, device, batch_size, classes):
                 if label == pred:
                     n_classcorrect[label] += 1
                 n_classsamples[label] += 1
+
+            pred_labels = pred_labels + predicted.tolist()
+            target_labels = target_labels + labels.tolist()
             
+        test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
         acc = (n_correct/n_samples)*100
-        print(f"samples accuracy: {acc:.3f}%")
+        print(f"Test accuracy: {acc:.3f}%")
+        print(f"Test F1 Score: {test_f1:.3f}")
 
         for i in range(4):
             acc = n_classcorrect[i]/n_classsamples[i] *100
             print(f"Acc for Class {classes[i]} = {acc:.3f}%")
+
+
+
+
+    # model.eval() 
+
+    # # Setup test loss and test accuracy values
+    # val_loss, val_acc = 0, 0
+    # pred_labels = []
+    # target_labels = []
+
+    # # Turn on inference context manager
+    # with torch.inference_mode():
+    #     # Loop through DataLoader batches
+    #     for batch, (X, y) in enumerate(dataloader):
+    #         # Send data to target device
+    #         X, y = X.to(device), y.to(device)
+
+    #         # 1. Forward pass
+    #         val_pred_logits = model(X)
+    # # 2. Calculate and accumulate loss
+    #         loss = loss_fn(val_pred_logits, y)
+    #         val_loss += loss.item()
+
+    #         # Calculate and accumulate accuracy
+    #         val_pred_labels = val_pred_logits.argmax(dim=1)
+    #         val_acc += ((val_pred_labels == y).sum().item()/len(val_pred_labels))
+            
+    #         pred_labels = pred_labels + val_pred_labels.tolist()
+    #         target_labels = target_labels + y.tolist()
+
+    # # Adjust metrics to get average loss and accuracy per batch 
+    # val_loss = val_loss / len(dataloader)
+    # val_acc = val_acc / len(dataloader)
+
+    # val_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
+    # return val_loss, val_acc, val_f1
