@@ -109,7 +109,7 @@ def train_step(model: torch.nn.Module,
 
 
 
-def test_step(model: torch.nn.Module, 
+def val_step(model: torch.nn.Module, 
               dataloader: torch.utils.data.DataLoader, 
               loss_fn: torch.nn.Module,
               device: torch.device):
@@ -134,7 +134,7 @@ def test_step(model: torch.nn.Module,
     model.eval() 
 
     # Setup test loss and test accuracy values
-    test_loss, test_acc = 0, 0
+    val_loss, val_acc = 0, 0
     pred_labels = []
     target_labels = []
 
@@ -146,29 +146,29 @@ def test_step(model: torch.nn.Module,
             X, y = X.to(device), y.to(device)
 
             # 1. Forward pass
-            test_pred_logits = model(X)
+            val_pred_logits = model(X)
     # 2. Calculate and accumulate loss
-            loss = loss_fn(test_pred_logits, y)
-            test_loss += loss.item()
+            loss = loss_fn(val_pred_logits, y)
+            val_loss += loss.item()
 
             # Calculate and accumulate accuracy
-            test_pred_labels = test_pred_logits.argmax(dim=1)
-            test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
+            val_pred_labels = val_pred_logits.argmax(dim=1)
+            val_acc += ((val_pred_labels == y).sum().item()/len(val_pred_labels))
             
-            pred_labels = pred_labels + test_pred_labels.tolist()
+            pred_labels = pred_labels + val_pred_labels.tolist()
             target_labels = target_labels + y.tolist()
 
     # Adjust metrics to get average loss and accuracy per batch 
-    test_loss = test_loss / len(dataloader)
-    test_acc = test_acc / len(dataloader)
+    val_loss = val_loss / len(dataloader)
+    val_acc = val_acc / len(dataloader)
 
-    test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
-    return test_loss, test_acc, test_f1
+    val_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
+    return val_loss, val_acc, val_f1
 
 
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
-          test_dataloader: torch.utils.data.DataLoader, 
+          val_dataloader: torch.utils.data.DataLoader, 
           optimizer: torch.optim.Optimizer,
           loss_fn: torch.nn.Module,
           epochs: int,
@@ -177,9 +177,9 @@ def train(model: torch.nn.Module,
     results = {"train_loss": [],
       "train_acc": [],
       "train_f1": [],
-      "test_loss": [],
-      "test_acc": [],
-      "test_f1": []
+      "val_loss": [],
+      "val_acc": [],
+      "val_f1": []
     }
 
     for epoch in tqdm(range(epochs)):
@@ -188,8 +188,8 @@ def train(model: torch.nn.Module,
                                           loss_fn=loss_fn,
                                           optimizer=optimizer,
                                           device=device)
-      test_loss, test_acc, test_f1 = test_step(model=model,
-          dataloader=test_dataloader,
+      val_loss, val_acc, val_f1 = val_step(model=model,
+          dataloader=val_dataloader,
           loss_fn=loss_fn,
           device=device)
 
@@ -199,25 +199,25 @@ def train(model: torch.nn.Module,
           f"train_loss: {train_loss:.4f} | "
           f"train_acc: {train_acc:.4f} | "
           f"train_f1: {train_f1:.4f} | "
-          f"test_loss: {test_loss:.4f} | "
-          f"test_acc: {test_acc:.4f} | "
-          f"test_f1: {test_f1:.4f} | "
+          f"val_loss: {val_loss:.4f} | "
+          f"val_acc: {val_acc:.4f} | "
+          f"val_f1: {val_f1:.4f} | "
       )
 
       # Update results dictionary
       results["train_loss"].append(train_loss)
       results["train_acc"].append(train_acc)
       results["train_f1"].append(train_f1)
-      results["test_loss"].append(test_loss)
-      results["test_acc"].append(test_acc)
-      results["test_f1"].append(test_f1)
+      results["val_loss"].append(val_loss)
+      results["val_acc"].append(val_acc)
+      results["val_f1"].append(val_f1)
 
   # Return the filled results at the end of the epochs
     return results
 
     
 def test_run(model, test_data, device, batch_size, classes):
-    
+
     with torch.no_grad():
         n_correct = 0
         n_samples = 0
