@@ -12,8 +12,6 @@ from typing import Dict, List, Tuple
 
 def load_efficient_net():
     model = models.efficientnet_b0(weights="DEFAULT")
-    # if pretrain:
-    #     weights = models.EfficientNet_B0_Weights.DEFAULT
     for param in model.features.parameters():
         param.requires_grad = False
     model.eval()
