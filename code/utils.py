@@ -215,7 +215,9 @@ def train(model: torch.nn.Module,
 
     
 def test_run(model, test_data, device, batch_size, classes):
-    with torch.no_grad():
+    model.eval()
+
+    with torch.inference_mode():
         n_correct = 0
         n_samples = 0
         n_classcorrect = [0 for i in range(4)] 
@@ -260,36 +262,3 @@ def test_run(model, test_data, device, batch_size, classes):
 
 
 
-    # model.eval() 
-
-    # # Setup test loss and test accuracy values
-    # val_loss, val_acc = 0, 0
-    # pred_labels = []
-    # target_labels = []
-
-    # # Turn on inference context manager
-    # with torch.inference_mode():
-    #     # Loop through DataLoader batches
-    #     for batch, (X, y) in enumerate(dataloader):
-    #         # Send data to target device
-    #         X, y = X.to(device), y.to(device)
-
-    #         # 1. Forward pass
-    #         val_pred_logits = model(X)
-    # # 2. Calculate and accumulate loss
-    #         loss = loss_fn(val_pred_logits, y)
-    #         val_loss += loss.item()
-
-    #         # Calculate and accumulate accuracy
-    #         val_pred_labels = val_pred_logits.argmax(dim=1)
-    #         val_acc += ((val_pred_labels == y).sum().item()/len(val_pred_labels))
-            
-    #         pred_labels = pred_labels + val_pred_labels.tolist()
-    #         target_labels = target_labels + y.tolist()
-
-    # # Adjust metrics to get average loss and accuracy per batch 
-    # val_loss = val_loss / len(dataloader)
-    # val_acc = val_acc / len(dataloader)
-
-    # val_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
-    # return val_loss, val_acc, val_f1
