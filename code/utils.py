@@ -216,12 +216,12 @@ def train(model: torch.nn.Module,
     
 def test_run(model, test_data, device, batch_size, classes):
     model.eval()
-
+    num_classes = len(classes)
     with torch.inference_mode():
         n_correct = 0
         n_samples = 0
-        n_classcorrect = [0 for i in range(4)] 
-        n_classsamples = [0 for i in range(4)]
+        n_classcorrect = [0 for i in range(num_classes)] 
+        n_classsamples = [0 for i in range(num_classes)]
 
         pred_labels = []
         target_labels = []
@@ -255,7 +255,7 @@ def test_run(model, test_data, device, batch_size, classes):
         print(f"Test accuracy: {acc:.3f}%")
         print(f"Test F1 Score: {test_f1:.3f}")
 
-        for i in range(4):
+        for i in range(num_classes):
             acc = n_classcorrect[i]/n_classsamples[i] *100
             print(f"Acc for Class {classes[i]} = {acc:.3f}%")
 
