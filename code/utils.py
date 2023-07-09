@@ -264,7 +264,7 @@ def test_run(model, test_data, device, batch_size, classes):
 
 
 
-def predict(model, img_path):
+def predict(model, img_path, device):
     img = Image.open(img_path)
     transformation = preprocess()
 
