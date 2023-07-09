@@ -2,6 +2,7 @@ import torchvision.models as models
 import torch
 import time
 import matplotlib.pyplot as plt
+from PIL import Image
 from torchvision import transforms
 from torcheval.metrics.functional import multiclass_f1_score
 
@@ -262,3 +263,18 @@ def test_run(model, test_data, device, batch_size, classes):
 
 
 
+
+def predict(model, img_path):
+    img = Image.open(img_path)
+    transformation = preprocess()
+
+    model.eval()
+
+    with torch.inference_mode():
+
+        transformed_img = transformation(img).unsqueeze(dim=0)
+        img_pred = model(transformed_img.to(device))
+
+    pred_label = torch.softmax(img_pred, dim=1).argmax(dim=1)
+
+    return pred_label
