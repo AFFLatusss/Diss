@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from torchvision import transforms
 from torcheval.metrics.functional import multiclass_f1_score
+from torchvision.utils import make_grid
 
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
@@ -278,3 +279,43 @@ def predict(model, img_path, device):
     pred_label = torch.softmax(img_pred, dim=1).argmax(dim=1)
 
     return pred_label
+
+
+def show_batch(dl):
+    """Plot images grid of single batch"""
+    for images, labels in dl:
+        fig,ax = plt.subplots(figsize = (16,12))
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.imshow(make_grid(images,nrow=10).permute(1,2,0))
+        break
+
+def display_img(img,label, classes):
+    plt.imshow(img.permute(1,2,0))
+    plt.xlabel(classes[label])
+    plt.xticks([])
+    plt.yticks([])
+
+def show_batch_with_labels(dl, classes):
+    plt.figure(figsize=(10,10))
+    images, labels = next(iter(dl))
+    for i in range(25):
+        plt.subplot(5,5, i+1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.grid(False)
+        display_img(images[i],labels[i].item())
+    plt.show()
+
+def get_model_size(model):
+    param_size = 0
+    buffer_size = 0
+
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    size_all_mb = (param_size + buffer_size)/1024**2
+    print(f"Model size: {size_all_mb:.3f} MB")
