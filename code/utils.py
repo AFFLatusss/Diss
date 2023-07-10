@@ -205,6 +205,7 @@ def train(model: torch.nn.Module,
           f"val_acc: {val_acc:.4f} | "
           f"val_f1: {val_f1:.4f} | "
       )
+      print("--------------------------------------------------------------")
 
       # Update results dictionary
       results["train_loss"].append(train_loss)
