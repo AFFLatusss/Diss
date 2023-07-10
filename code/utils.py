@@ -6,6 +6,8 @@ from PIL import Image
 from torchvision import transforms
 from torcheval.metrics.functional import multiclass_f1_score
 from torchvision.utils import make_grid
+from torcheval.metrics import MulticlassConfusionMatrix
+from sklearn.metrics import classification_report
 
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
@@ -252,14 +254,21 @@ def test_run(model, test_data, device, batch_size, classes):
             pred_labels = pred_labels + predicted.tolist()
             target_labels = target_labels + labels.tolist()
             
-        test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=4)
-        acc = (n_correct/n_samples)*100
-        print(f"Test accuracy: {acc:.3f}%")
-        print(f"Test F1 Score: {test_f1:.3f}")
+        test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=num_classes, average="macro")
+        # acc = (n_correct/n_samples)*100
+        # print(f"Test accuracy: {acc:.3f}%")
+        # print(f"Test F1 Score: {test_f1:.3f}")
 
-        for i in range(num_classes):
-            acc = n_classcorrect[i]/n_classsamples[i] *100
-            print(f"Acc for Class {classes[i]} = {acc:.3f}%")
+        # for i in range(num_classes):
+        #     acc = n_classcorrect[i]/n_classsamples[i] *100
+        #     print(f"Acc for Class {classes[i]} = {acc:.3f}%")
+
+        # metric = MulticlassConfusionMatrix(num_classes)
+        # metric.update(torch.tensor(pred_labels), torch.tensor(target_labels))
+        
+
+    return classification_report(target_labels, pred_labels, target_names=classes)
+
 
 
 
