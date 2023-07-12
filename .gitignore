@@ -15,3 +15,4 @@ test.py
 code/__pycache__/
 win_test.py
 Combined_data/
+Combined_train_test/
