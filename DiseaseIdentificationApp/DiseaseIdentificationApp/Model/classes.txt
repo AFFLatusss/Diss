@@ -1,0 +1,5 @@
+Apple_scab
+No_leaves
+Healthy
+Cedar_apple_rust
+Black_rot
