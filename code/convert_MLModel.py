@@ -13,14 +13,11 @@ def convert_to_mlmodel(model, class_labels, name, test_img):
                             scale=scale, bias=bias)
     
     traced_model = torch.jit.trace(model, test_img)
-    # out = traced_model(img1)
-    # print(out)
 
     ios_model = ct.convert(
         traced_model,
         inputs=[image_input],
         classifier_config = ct.ClassifierConfig(class_labels),
-        # compute_units=ct.ComputeUnit.CPU_ONLY,
     )
 
     ios_model.save("ML_Models/"+ name +".mlmodel")
