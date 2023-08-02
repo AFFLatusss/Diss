@@ -286,6 +286,9 @@ def predict(model, img_path, device):
         transformed_img = transformation(img).unsqueeze(dim=0)
         img_pred = model(transformed_img.to(device))
 
+    print(img_pred)
+    # print(torch.softmax(img_pred, dim=1))
+    # print(torch.softmax(img_pred, dim=1).argmax(dim=1))
     pred_label = torch.softmax(img_pred, dim=1).argmax(dim=1)
 
     return pred_label
