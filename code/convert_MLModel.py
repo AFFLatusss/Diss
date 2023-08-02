@@ -33,8 +33,11 @@ def convert_to_mlmodel(model, class_labels, name, test_img_path):
         classifier_config = ct.ClassifierConfig(class_labels),
     )
 
-    ios_model.save("ML_Models/"+ name +".mlmodel")
+    ios_model.save("../ML_Models/" + name + ".mlmodel")
 
+    print("-------------Convert successfully-------------------")
+    print("Model saved at" + "../ML_Models/" + name + ".mlmodel")
+    print("-------------Testing converted model-------------------")
 
     img = PIL.Image.open(test_img_path)
     img = img.resize([224, 224])
