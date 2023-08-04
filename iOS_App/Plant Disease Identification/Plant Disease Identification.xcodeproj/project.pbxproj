@@ -13,6 +13,8 @@
 		822FE4212A7A64750061AB7A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 822FE41F2A7A64750061AB7A /* Main.storyboard */; };
 		822FE4232A7A64760061AB7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 822FE4222A7A64760061AB7A /* Assets.xcassets */; };
 		822FE4262A7A64760061AB7A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 822FE4242A7A64760061AB7A /* LaunchScreen.storyboard */; };
+		822FE42F2A7D04830061AB7A /* combined_model.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 822FE42E2A7D04830061AB7A /* combined_model.mlmodel */; };
+		822FE4312A7D04CC0061AB7A /* imageConvert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FE4302A7D04CC0061AB7A /* imageConvert.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		822FE4222A7A64760061AB7A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "Plant Disease Identification/Assets.xcassets"; sourceTree = SOURCE_ROOT; };
 		822FE4252A7A64760061AB7A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		822FE4272A7A64760061AB7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		822FE42E2A7D04830061AB7A /* combined_model.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = combined_model.mlmodel; path = ../../../../ML_Models/combined_model.mlmodel; sourceTree = "<group>"; };
+		822FE4302A7D04CC0061AB7A /* imageConvert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = imageConvert.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,7 @@
 		822FE4182A7A64750061AB7A /* Plant Disease Identification */ = {
 			isa = PBXGroup;
 			children = (
+				822FE42D2A7D04690061AB7A /* Models */,
 				822FE4192A7A64750061AB7A /* AppDelegate.swift */,
 				822FE41B2A7A64750061AB7A /* SceneDelegate.swift */,
 				822FE41D2A7A64750061AB7A /* ViewController.swift */,
@@ -65,6 +70,15 @@
 				822FE4272A7A64760061AB7A /* Info.plist */,
 			);
 			path = "Plant Disease Identification";
+			sourceTree = "<group>";
+		};
+		822FE42D2A7D04690061AB7A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				822FE42E2A7D04830061AB7A /* combined_model.mlmodel */,
+				822FE4302A7D04CC0061AB7A /* imageConvert.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,6 +155,8 @@
 				822FE41E2A7A64750061AB7A /* ViewController.swift in Sources */,
 				822FE41A2A7A64750061AB7A /* AppDelegate.swift in Sources */,
 				822FE41C2A7A64750061AB7A /* SceneDelegate.swift in Sources */,
+				822FE4312A7D04CC0061AB7A /* imageConvert.swift in Sources */,
+				822FE42F2A7D04830061AB7A /* combined_model.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
