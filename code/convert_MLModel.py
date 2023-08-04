@@ -37,9 +37,9 @@ def convert_to_mlmodel(model, class_labels, name, test_img_path):
 
     print("-------------Convert successfully-------------------")
     print("Model saved at" + "../ML_Models/" + name + ".mlmodel")
-    print("-------------Testing converted model-------------------")
+    print("-------------Testing converted model----------------")
 
     img = PIL.Image.open(test_img_path)
     img = img.resize([224, 224])
-    ios_model.predict({"x_1":img})['classLabel']
+    print(ios_model.predict({"x_1":img})['classLabel'])
     
