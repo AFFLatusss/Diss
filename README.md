@@ -2,7 +2,7 @@
 Master Project
 
 
-
+```bash
 ├── Data
 │   ├── Augmentation
 │   ├── Originals/Apple
@@ -17,6 +17,7 @@ Master Project
 ├── README.MD
 ├── RongJianYee_PoP.pdf
 └── .gitignore
+```
 
 iOS Application is under the folder iOS_App/plane_disease_identification
 
