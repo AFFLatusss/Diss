@@ -22,12 +22,28 @@ def load_efficient_net():
 
     return model
 
+def load_resnet():
+    model = models.resnet18(weights="DEFAULT")
+    for param in model.parameters():
+        param.requires_grad = True
+    model.eval()
+
+    return model
+
+def load_vgg():
+    model = models.vgg11(weights="DEFAULT")
+    for param in model.features.parameters():
+        param.requires_grad = False
+    model.eval()
+
+    return model
+
 
 def load_mobile_net():
     model = models.mobilenet_v2(weights="DEFAULT")
 
     for param in model.features.parameters():
-        param.requires_grad = False
+        param.requires_grad = True
     model.eval()
 
     return model
