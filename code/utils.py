@@ -17,7 +17,7 @@ from typing import Dict, List, Tuple
 def load_efficient_net():
     model = models.efficientnet_b0(weights="DEFAULT")
     for param in model.features.parameters():
-        param.requires_grad = False
+        param.requires_grad = True
     model.eval()
 
     return model
@@ -33,7 +33,7 @@ def load_resnet():
 def load_vgg():
     model = models.vgg11(weights="DEFAULT")
     for param in model.features.parameters():
-        param.requires_grad = False
+        param.requires_grad = True
     model.eval()
 
     return model
