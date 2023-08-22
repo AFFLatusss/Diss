@@ -11,15 +11,6 @@ import CoreML
 import CoreImage
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-//    @IBOutlet weak var selectImageButton: UIButton!
-//    @IBOutlet weak var imageView: UIImageView!
-    
-//    @IBAction func selectImageTapped(_ sender: UIButton) {
-//        let imagePicker = UIImagePickerController()
-//        imagePicker.sourceType = .photoLibrary
-//        imagePicker.delegate = self
-//        present(imagePicker, animated: true, completion: nil)
-//    }
     
     private let label:UILabel = {
         let label = UILabel()
@@ -40,6 +31,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
          
         return imageView
     }()
+    
 //    let model = ModelManager.shared.getModel()
     
     override func viewDidLoad() {
@@ -69,9 +61,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                                  width:view.frame.size.width-40,
                                  height: view.frame.size.height-400)
         
-//        label.frame = CGRect(x:20, y:view.safeAreaInsets.top+(view.frame.size.width-40)+10,
-//                             width: view.frame.size.width-40,
-//                             height:100)
+
         label.frame = CGRect(x: 20, y: view.frame.size.height - 200,
                              width: view.frame.size.width - 40,
                              height: 100)
