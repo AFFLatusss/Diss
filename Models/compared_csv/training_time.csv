@@ -1,0 +1,19 @@
+(128, 0.005)
+efficientNet -23m 51s
+mobileNet - 16m 54s
+ResNet - 11m 54s
+
+(128, 0.05)
+efficientNet -22m 50s
+mobileNet - 13m 07s
+ResNet - 12m 24s
+
+(64, 0.001)
+efficientNet -16m 39s
+mobileNet - 13m 32s
+ResNet - 11m 00s
+
+(64, 0.001)
+efficientNet -14m 33s
+mobileNet - 11m 57s
+ResNet - 10m 22s
