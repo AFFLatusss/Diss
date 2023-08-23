@@ -1,6 +1,7 @@
 import torchvision.models as models
 import torch
-import time
+from datetime import datetime
+import os
 import matplotlib.pyplot as plt
 from PIL import Image
 from torchvision import transforms
@@ -8,11 +9,22 @@ from torcheval.metrics.functional import multiclass_f1_score
 from torchvision.utils import make_grid
 from torcheval.metrics import MulticlassConfusionMatrix
 from sklearn.metrics import classification_report
+from torch.utils.tensorboard import SummaryWriter
+
 
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
 
+def set_seeds(seed=42):
+    """Sets random sets for torch operations.
 
+    Args:
+        seed (int, optional): Random seed to set. Defaults to 42.
+    """
+    # Set the seed for general torch operations
+    torch.manual_seed(seed)
+    # Set the seed for CUDA torch operations (ones that happen on the GPU)
+    torch.cuda.manual_seed(seed)
 
 def load_efficient_net():
     model = models.efficientnet_b0(weights="DEFAULT")
@@ -57,6 +69,46 @@ def preprocess():
                                          std=[0.229, 0.224, 0.225]) # 4. A standard deviation of [0.229, 0.224, 0.225] (across each colour channel),
 ])
     return transform
+
+
+def create_writer(experiment_name: str, 
+                  model_name: str, 
+                  extra: str=None) -> torch.utils.tensorboard.writer.SummaryWriter():
+    """Creates a torch.utils.tensorboard.writer.SummaryWriter() instance saving to a specific log_dir.
+
+    log_dir is a combination of runs/timestamp/experiment_name/model_name/extra.
+
+    Where timestamp is the current date in YYYY-MM-DD format.
+
+    Args:
+        experiment_name (str): Name of experiment.
+        model_name (str): Name of model.
+        extra (str, optional): Anything extra to add to the directory. Defaults to None.
+
+    Returns:
+        torch.utils.tensorboard.writer.SummaryWriter(): Instance of a writer saving to log_dir.
+
+    Example usage:
+        # Create a writer saving to "runs/2022-06-04/data_10_percent/effnetb2/5_epochs/"
+        writer = create_writer(experiment_name="data_10_percent",
+                               model_name="effnetb2",
+                               extra="5_epochs")
+        # The above is the same as:
+        writer = SummaryWriter(log_dir="runs/2022-06-04/data_10_percent/effnetb2/5_epochs/")
+    """
+    
+
+    # Get timestamp of current date (all experiments on certain day live in same folder)
+    timestamp = datetime.now().strftime("%Y-%m-%d") # returns current date in YYYY-MM-DD format
+
+    if extra:
+        # Create log directory path
+        log_dir = os.path.join("runs", timestamp, experiment_name, model_name, extra)
+    else:
+        log_dir = os.path.join("runs", timestamp, experiment_name, model_name)
+        
+    print(f"[INFO] Created SummaryWriter, saving to: {log_dir}...")
+    return SummaryWriter(log_dir=log_dir)
 
 
 def train_step(model: torch.nn.Module, 
@@ -190,7 +242,8 @@ def train(model: torch.nn.Module,
           optimizer: torch.optim.Optimizer,
           loss_fn: torch.nn.Module,
           epochs: int,
-          device: torch.device) -> Dict[str, List]:
+          device: torch.device,
+          writer: torch.utils.tensorboard.writer.SummaryWriter) -> Dict[str, List]:
     
     results = {"train_loss": [],
       "train_acc": [],
@@ -230,6 +283,28 @@ def train(model: torch.nn.Module,
       results["val_loss"].append(val_loss)
       results["val_acc"].append(val_acc)
       results["val_f1"].append(val_f1)
+
+      if writer:
+        # Add results to SummaryWriter
+        writer.add_scalars(main_tag="Loss", 
+                            tag_scalar_dict={"train_loss": train_loss,
+                                            "val_loss": val_loss},
+                            global_step=epoch)
+        
+        writer.add_scalars(main_tag="Accuracy", 
+                            tag_scalar_dict={"train_acc": train_acc,
+                                            "vall_acc": val_acc}, 
+                            global_step=epoch)
+        
+        writer.add_scalars(main_tag="F1", 
+                            tag_scalar_dict={"train_f1": train_f1,
+                                            "vall_f1": val_f1}, 
+                            global_step=epoch)
+
+        # Close the writer
+        writer.close()
+    else:
+        pass
 
   # Return the filled results at the end of the epochs
     return results
