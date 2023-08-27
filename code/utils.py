@@ -60,6 +60,16 @@ def load_mobile_net():
 
     return model
 
+
+def load_model(path):
+    if torch.backends.mps.is_available():
+        model = torch.load(path, map_location=torch.device('mps'))
+    elif torch.cuda.is_available():
+        model = torch.load(path, map_location=torch.device('cuda'))
+    
+    return model
+
+
 def preprocess():
     
     transform = transforms.Compose([
@@ -278,7 +288,7 @@ def train(model: torch.nn.Module,
     return results
 
     
-def test_run(model, test_data, device, batch_size, classes):
+def test_run(model, test_data, device, classes):
     model.eval()
     num_classes = len(classes)
     with torch.inference_mode():
@@ -303,17 +313,20 @@ def test_run(model, test_data, device, batch_size, classes):
 
             
 
-            for i in range(len(labels)):
-                label = labels[i]
-                pred = predicted[i]
-                if label == pred:
-                    n_classcorrect[label] += 1
-                n_classsamples[label] += 1
+            # for i in range(len(labels)):
+            #     label = labels[i]
+            #     pred = predicted[i]
+            #     if label == pred:
+            #         n_classcorrect[label] += 1
+            #     n_classsamples[label] += 1
 
 
             pred_labels = pred_labels + predicted.tolist()
+            
             target_labels = target_labels + labels.tolist()
             
+        # print(set(pred_labels))
+        # print(set(target_labels))
         test_f1 = multiclass_f1_score(torch.tensor(pred_labels), torch.tensor(target_labels), num_classes=num_classes, average="macro")
         # acc = (n_correct/n_samples)*100
         # print(f"Test accuracy: {acc:.3f}%")
@@ -326,6 +339,8 @@ def test_run(model, test_data, device, batch_size, classes):
         # metric = MulticlassConfusionMatrix(num_classes)
         # metric.update(torch.tensor(pred_labels), torch.tensor(target_labels))
         
+    
+    # return pred_labels, target_labels
 
     return classification_report(target_labels, pred_labels, target_names=classes)
 
