@@ -379,9 +379,10 @@ def show_batch(dl):
 
 def display_img(img,label, classes):
     plt.imshow(img.permute(1,2,0))
-    plt.xlabel(classes[label])
+    plt.xlabel(classes[label], fontsize=7)
     plt.xticks([])
     plt.yticks([])
+    plt.tight_layout()
 
 def show_batch_with_labels(dl, classes):
     plt.figure(figsize=(10,10))
@@ -391,7 +392,7 @@ def show_batch_with_labels(dl, classes):
         plt.xticks([])
         plt.yticks([])
         plt.grid(False)
-        display_img(images[i],labels[i].item())
+        display_img(images[i],labels[i].item(), classes)
     plt.show()
 
 def get_model_size(model):
